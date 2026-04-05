@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1976d2"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="600" y="45" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#1a237e" text-anchor="middle">Hình 2.1: Tổng quan bốn công cụ AI của hệ thống Tutor AI Agent</text>
+  
+  <!-- Main container -->
+  <rect x="50" y="70" width="1100" height="680" rx="15" fill="#fafafa" stroke="#e0e0e0" stroke-width="2" filter="url(#shadow)"/>
+  
+  <!-- Tutor Chat Agent -->
+  <g transform="translate(80, 120)">
+    <rect width="240" height="180" rx="12" fill="#fff8e1" stroke="#ff9800" stroke-width="3" filter="url(#shadow)"/>
+    <text x="120" y="35" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">🎓</text>
+    <text x="120" y="60" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#ff9800" text-anchor="middle">Tutor Chat Agent</text>
+    <line x1="20" y1="75" x2="220" y2="75" stroke="#ff9800" stroke-width="1" opacity="0.3"/>
+    <text x="25" y="100" font-family="Arial, sans-serif" font-size="13" fill="#424242">• Giải đáp thắc mắc 1-1</text>
+    <text x="25" y="125" font-family="Arial, sans-serif" font-size="13" fill="#424242">• Tích hợp kỹ thuật RAG</text>
+    <text x="25" y="150" font-family="Arial, sans-serif" font-size="13" fill="#424242">• Vẽ sơ đồ UML/Flowchart</text>
+    <text x="25" y="175" font-family="Arial, sans-serif" font-size="13" fill="#424242">• Trích dẫn nguồn chính xác</text>
+  </g>
+  
+  <!-- Quiz Generator Agent -->
+  <g transform="translate(370, 120)">
+    <rect width="240" height="180" rx="12" fill="#f3e5f5" stroke="#9c27b0" stroke-width="3" filter="url(#shadow)"/>
+    <text x="120" y="35" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">📝</text>
+    <text x="120" y="60" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#9c27b0" text-anchor="middle">Quiz Generator Agent</text>
+    <line x1="20" y1="75" x2="220" y2="75" stroke="#9c27b0" stroke-width="1" opacity="0.3"/>
+    <text x="25" y="100" font-family="Arial, sans-serif" font-size="13" fill="#424242">• Sinh câu hỏi trắc nghiệm</text>
+    <text x="25" y="125" font-family="Arial, sans-serif" font-size="13" fill="#424242">• Đa dạng dạng câu hỏi</text>
+    <text x="25" y="150" font-family="Arial, sans-serif" font-size="13" fill="#424242">• Phân cấp độ (Dễ/Trung bình/Khó)</text>
+    <text x="25" y="175" font-family="Arial, sans-serif" font-size="13" fill="#424242">• Giải thích đáp án chi tiết</text>
+  </g>
+  
+  <!-- Immersive Text Agent -->
+  <g transform="translate(660, 120)">
+    <rect width="240" height="180" rx="12" fill="#e8f5e9" stroke="#4caf50" stroke-width="3" filter="url(#shadow)"/>
+    <text x="120" y="35" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">📖</text>
+    <text x="120" y="60" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#4caf50" text-anchor="middle">Immersive Text Agent</text>
+    <line x1="20" y1="75" x2="220" y2="75" stroke="#4caf50" stroke-width="1" opacity="0.3"/>
+    <text x="25" y="100" font-family="Arial, sans-serif" font-size="13" fill="#424242">• Chuyển đổi tài liệu khô khan</text>
+    <text x="25" y="125" font-family="Arial, sans-serif" font-size="13" fill="#424242">• Tóm tắt, diễn giải thuật ngữ</text>
+    <text x="25" y="150" font-family="Arial, sans-serif" font-size="13" fill="#424242">• Thêm ví dụ thực tế</text>
+    <text x="25" y="175" font-family="Arial, sans-serif" font-size="13" fill="#424242">• Micro-quiz cuối mỗi phần</text>
+  </g>
+  
+  <!-- Mindmap Generator Agent -->
+  <g transform="translate(950, 120)">
+    <rect width="180" height="180" rx="12" fill="#fff3e0" stroke="#ff5722" stroke-width="3" filter="url(#shadow)"/>
+    <text x="90" y="35" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">🧠</text>
+    <text x="90" y="60" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ff5722" text-anchor="middle">Mindmap Generator</text>
+    <line x1="15" y1="75" x2="165" y2="75" stroke="#ff5722" stroke-width="1" opacity="0.3"/>
+    <text x="15" y="100" font-family="Arial, sans-serif" font-size="12" fill="#424242">• Phân tích bài học</text>
+    <text x="15" y="125" font-family="Arial, sans-serif" font-size="12" fill="#424242">• Tạo sơ đồ tư duy</text>
+    <text x="15" y="150" font-family="Arial, sans-serif" font-size="12" fill="#424242">• Cấu trúc nhánh đa cấp</text>
+    <text x="15" y="175" font-family="Arial, sans-serif" font-size="12" fill="#424242">• Trực quan hóa kiến thức</text>
+  </g>
+  
+  <!-- RAG Knowledge Base - Center -->
+  <g transform="translate(450, 380)">
+    <ellipse cx="150" cy="50" rx="140" ry="55" fill="#e3f2fd" stroke="#1976d2" stroke-width="4" filter="url(#shadow)"/>
+    <text x="150" y="40" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">📚</text>
+    <text x="150" y="65" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#0d47a1" text-anchor="middle">RAG Knowledge Base</text>
+    <text x="150" y="85" font-family="Arial, sans-serif" font-size="13" fill="#1565c0" text-anchor="middle">(Vector Database)</text>
+  </g>
+  
+  <!-- Document Input -->
+  <g transform="translate(80, 540)">
+    <rect width="200" height="90" rx="10" fill="#fafafa" stroke="#757575" stroke-width="2" filter="url(#shadow)"/>
+    <text x="100" y="35" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">📄</text>
+    <text x="100" y="60" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#424242" text-anchor="middle">Tài liệu học tập</text>
+    <text x="100" y="80" font-family="Arial, sans-serif" font-size="12" fill="#757575" text-anchor="middle">(PDF, DOCX)</text>
+  </g>
+  
+  <!-- Student Output -->
+  <g transform="translate(920, 540)">
+    <rect width="200" height="90" rx="10" fill="#e1f5fe" stroke="#0288d1" stroke-width="2" filter="url(#shadow)"/>
+    <text x="100" y="35" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">👨‍🎓</text>
+    <text x="100" y="60" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#01579b" text-anchor="middle">Sinh viên</text>
+    <text x="100" y="80" font-family="Arial, sans-serif" font-size="12" fill="#0288d1" text-anchor="middle">(Người học)</text>
+  </g>
+  
+  <!-- Arrows from documents to RAG -->
+  <path d="M 280 585 Q 350 520 450 450" stroke="#1976d2" stroke-width="2.5" fill="none" marker-end="url(#arrowBlue)"/>
+  <text x="320" y="510" font-family="Arial, sans-serif" font-size="11" fill="#1976d2" font-style="italic">Nạp &amp; Vector hóa</text>
+  
+  <!-- Arrows from RAG to Student -->
+  <path d="M 740 430 Q 820 500 920 585" stroke="#1976d2" stroke-width="2.5" fill="none" marker-end="url(#arrowBlue)"/>
+  <text x="800" y="520" font-family="Arial, sans-serif" font-size="11" fill="#1976d2" font-style="italic">Phục vụ học tập</text>
+  
+  <!-- Arrows from RAG to Tools -->
+  <line x1="520" y1="380" x2="200" y2="300" stroke="#ff9800" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="560" y1="380" x2="490" y2="300" stroke="#9c27b0" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="640" y1="380" x2="780" y2="300" stroke="#4caf50" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="680" y1="400" x2="950" y2="300" stroke="#ff5722" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Gemini API Label -->
+  <rect x="350" y="680" width="500" height="35" rx="8" fill="#f5f5f5" stroke="#bdbdbd" stroke-width="1"/>
+  <text x="600" y="703" font-family="Arial, sans-serif" font-size="12" fill="#607d8b" text-anchor="middle">⚡ Powered by Google Gemini API (gemini-2.5-pro, gemini-2.5-flash, text-embedding-004)</text>
+  
+  <!-- Process labels -->
+  <text x="150" y="420" font-family="Arial, sans-serif" font-size="10" fill="#757575" text-anchor="middle">Truy xuất ngữ cảnh</text>
+  <text x="440" y="350" font-family="Arial, sans-serif" font-size="10" fill="#757575" text-anchor="middle">Trích xuất nội dung</text>
+  <text x="760" y="350" font-family="Arial, sans-serif" font-size="10" fill="#757575" text-anchor="middle">Đọc text gốc</text>
+  <text x="880" y="400" font-family="Arial, sans-serif" font-size="10" fill="#757575" text-anchor="middle">Phân tích cấu trúc</text>
+</svg>

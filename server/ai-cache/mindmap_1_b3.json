@@ -1,0 +1,85 @@
+{
+  "chainOfThought": {
+    "summary": "Bài giảng này định nghĩa chuyển đổi số trong giáo dục, liệt kê các hình thức học tập số và các công nghệ hỗ trợ.",
+    "topics": [
+      "1. CĐS giáo dục là gì? - gồm định nghĩa",
+      "2. Các hình thức học tập số - gồm E-learning, Blended Learning, MOOC, Micro-learning, Gamification",
+      "3. Công nghệ hỗ trợ CĐS giáo dục - gồm LMS, AI Tutor, VR/AR, Learning Analytics"
+    ]
+  },
+  "root": {
+    "label": "Chuyển đổi số trong giáo dục",
+    "children": [
+      {
+        "label": "Khái niệm CĐS giáo dục",
+        "children": [
+          {
+            "label": "Ứng dụng công nghệ số"
+          },
+          {
+            "label": "Thay đổi phương thức",
+            "children": [
+              {
+                "label": "Giảng dạy"
+              },
+              {
+                "label": "Học tập"
+              },
+              {
+                "label": "Quản lý"
+              }
+            ]
+          },
+          {
+            "label": "Mục tiêu",
+            "children": [
+              {
+                "label": "Nâng cao chất lượng"
+              },
+              {
+                "label": "Nâng cao hiệu quả"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Hình thức học tập số",
+        "children": [
+          {
+            "label": "E-learning"
+          },
+          {
+            "label": "Blended Learning"
+          },
+          {
+            "label": "MOOC"
+          },
+          {
+            "label": "Micro-learning"
+          },
+          {
+            "label": "Gamification"
+          }
+        ]
+      },
+      {
+        "label": "Công nghệ hỗ trợ",
+        "children": [
+          {
+            "label": "LMS"
+          },
+          {
+            "label": "AI Tutor"
+          },
+          {
+            "label": "VR/AR"
+          },
+          {
+            "label": "Learning Analytics"
+          }
+        ]
+      }
+    ]
+  }
+}

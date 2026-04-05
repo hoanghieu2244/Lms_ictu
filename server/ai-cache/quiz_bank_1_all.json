@@ -1,0 +1,530 @@
+[
+  {
+    "id": 1,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": "Theo định nghĩa, Chuyển đổi số (Digital Transformation) là gì?",
+    "options": [
+      "Quá trình thay đổi tổng thể và toàn diện dựa trên công nghệ số.",
+      "Quá trình quét tài liệu giấy thành file PDF.",
+      "Quá trình sử dụng phần mềm thay cho sổ sách.",
+      "Quá trình cài đặt mạng máy tính cho công ty."
+    ],
+    "correctIdx": 0,
+    "explanation": "Chuyển đổi số là quá trình thay đổi tổng thể và toàn diện của cá nhân, tổ chức về cách sống, cách làm việc và phương thức sản xuất dựa trên các công nghệ số."
+  },
+  {
+    "id": 2,
+    "type": "true_false",
+    "difficulty": "easy",
+    "question": "Số hóa (Digitization) và Chuyển đổi số (Digital Transformation) là hai thuật ngữ đồng nghĩa.",
+    "answer": false,
+    "explanation": "Số hóa chỉ là chuyển đổi thông tin từ dạng vật lý sang kỹ thuật số, là một phần nhỏ của Chuyển đổi số - vốn là sự thay đổi toàn diện về mô hình hoạt động."
+  },
+  {
+    "id": 3,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": "Điểm khác biệt cơ bản nhất giữa Tin học hóa (Digitalization) và Chuyển đổi số (Digital Transformation) là gì?",
+    "options": [
+      "Tin học hóa chỉ cải thiện quy trình hiện có, Chuyển đổi số thay đổi toàn diện mô hình kinh doanh.",
+      "Tin học hóa dùng máy tính, Chuyển đổi số dùng internet.",
+      "Tin học hóa áp dụng cho cá nhân, Chuyển đổi số áp dụng cho tổ chức.",
+      "Tin học hóa là miễn phí, Chuyển đổi số tốn nhiều chi phí."
+    ],
+    "correctIdx": 0,
+    "explanation": "Tin học hóa (Digitalization) là sử dụng công nghệ số để cải thiện quy trình hiện có, trong khi Chuyển đổi số (Digital Transformation) là thay đổi toàn diện mô hình kinh doanh và tổ chức."
+  },
+  {
+    "id": 4,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": "Công nghệ nào sau đây được mô tả là 'công nghệ sổ cái phân tán, đảm bảo tính minh bạch và bảo mật'?",
+    "options": [
+      "Trí tuệ nhân tạo (AI)",
+      "Internet vạn vật (IoT)",
+      "Điện toán đám mây (Cloud Computing)",
+      "Blockchain"
+    ],
+    "correctIdx": 3,
+    "explanation": "Blockchain được định nghĩa là công nghệ sổ cái phân tán, đảm bảo tính minh bạch và bảo mật."
+  },
+  {
+    "id": 5,
+    "type": "true_false",
+    "difficulty": "hard",
+    "question": "Mục tiêu chính của chuyển đổi số là giảm chi phí vận hành, trong khi việc nâng cao trải nghiệm khách hàng chỉ là lợi ích thứ yếu.",
+    "answer": false,
+    "explanation": "Nâng cao trải nghiệm khách hàng và giảm chi phí vận hành đều là những lý do quan trọng và cần thiết để thực hiện chuyển đổi số, không có sự phân biệt chính-phụ."
+  },
+  {
+    "id": 6,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": "Trong các trụ cột của chuyển đổi số doanh nghiệp, việc tạo ra trải nghiệm đa kênh (omnichannel) thuộc về trụ cột nào?",
+    "options": [
+      "Trải nghiệm khách hàng",
+      "Quy trình hoạt động",
+      "Mô hình kinh doanh",
+      "Văn hóa tổ chức"
+    ],
+    "correctIdx": 0,
+    "explanation": "Trải nghiệm đa kênh (omnichannel) là một phần của trụ cột 'Trải nghiệm khách hàng' trong chuyển đổi số doanh nghiệp."
+  },
+  {
+    "id": 7,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": "Giai đoạn nào trong quá trình chuyển đổi số doanh nghiệp tập trung vào việc thí điểm các giải pháp số ở quy mô nhỏ?",
+    "options": [
+      "Khởi đầu",
+      "Thử nghiệm",
+      "Mở rộng",
+      "Chuyển đổi"
+    ],
+    "correctIdx": 1,
+    "explanation": "Giai đoạn 2 'Thử nghiệm' là giai đoạn doanh nghiệp thí điểm các giải pháp số để đánh giá hiệu quả trước khi triển khai rộng."
+  },
+  {
+    "id": 8,
+    "type": "true_false",
+    "difficulty": "medium",
+    "question": "Giai đoạn cuối cùng của quá trình chuyển đổi số doanh nghiệp là 'Chuyển đổi', khi mô hình hoạt động được thay đổi toàn diện.",
+    "answer": false,
+    "explanation": "Giai đoạn cuối cùng (thứ 5) là 'Tối ưu', tập trung vào việc liên tục cải tiến và đổi mới, sau giai đoạn 'Chuyển đổi'."
+  },
+  {
+    "id": 9,
+    "type": "multiple_choice",
+    "difficulty": "hard",
+    "question": "Một công ty sau khi thử nghiệm thành công chatbot hỗ trợ khách hàng ở một phòng ban, đã quyết định triển khai nó cho toàn bộ công ty. Công ty này đang ở giai đoạn nào của CĐS?",
+    "options": [
+      "Khởi đầu",
+      "Thử nghiệm",
+      "Mở rộng",
+      "Tối ưu"
+    ],
+    "correctIdx": 2,
+    "explanation": "Đây là giai đoạn 'Mở rộng', khi doanh nghiệp triển khai rộng các sáng kiến đã được thử nghiệm thành công."
+  },
+  {
+    "id": 10,
+    "type": "true_false",
+    "difficulty": "easy",
+    "question": "Việc ra quyết định dựa trên dữ liệu là một trong bốn trụ cột chính của chuyển đổi số doanh nghiệp.",
+    "answer": true,
+    "explanation": "Văn bản liệt kê 4 trụ cột của CĐS doanh nghiệp, trong đó có 'Dữ liệu và phân tích: Ra quyết định dựa trên dữ liệu'."
+  },
+  {
+    "id": 11,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": "Hình thức học tập kết hợp giữa các buổi học trực tiếp trên lớp và các hoạt động học trực tuyến được gọi là gì?",
+    "options": [
+      "E-learning",
+      "Blended Learning",
+      "MOOC",
+      "Micro-learning"
+    ],
+    "correctIdx": 1,
+    "explanation": "Blended Learning được định nghĩa là hình thức kết hợp học trực tiếp và trực tuyến."
+  },
+  {
+    "id": 12,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": "Công nghệ nào trong giáo dục số giúp quản lý các khóa học, theo dõi tiến độ của học viên và cung cấp tài liệu học tập?",
+    "options": [
+      "AI Tutor",
+      "VR/AR",
+      "LMS (Learning Management System)",
+      "Learning Analytics"
+    ],
+    "correctIdx": 2,
+    "explanation": "LMS (Learning Management System) là hệ thống quản lý học tập, có chức năng quản lý khóa học, học viên và tài liệu."
+  },
+  {
+    "id": 13,
+    "type": "true_false",
+    "difficulty": "medium",
+    "question": "MOOC là viết tắt của các khóa học trực tuyến quy mô nhỏ và có thu phí cao.",
+    "answer": false,
+    "explanation": "MOOC là viết tắt của 'Massive Open Online Course', tức là Khóa học mở trực tuyến quy mô lớn, thường có thể miễn phí hoặc chi phí thấp."
+  },
+  {
+    "id": 14,
+    "type": "multiple_choice",
+    "difficulty": "hard",
+    "question": "Phương pháp học tập chia nhỏ nội dung thành các đơn vị kiến thức ngắn gọn, tập trung vào một mục tiêu cụ thể được gọi là gì?",
+    "options": [
+      "Gamification",
+      "Blended Learning",
+      "E-learning",
+      "Micro-learning"
+    ],
+    "correctIdx": 3,
+    "explanation": "Micro-learning là hình thức học theo từng phần nhỏ, ngắn gọn, giúp người học dễ dàng tiếp thu kiến thức."
+  },
+  {
+    "id": 15,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": "Lĩnh vực khoa học máy tính phát triển các hệ thống có khả năng học hỏi, nhận dạng hình ảnh và ra quyết định được gọi là gì?",
+    "options": [
+      "Internet vạn vật (IoT)",
+      "Trí tuệ nhân tạo (AI)",
+      "Dữ liệu lớn (Big Data)",
+      "Điện toán đám mây (Cloud Computing)"
+    ],
+    "correctIdx": 1,
+    "explanation": "Trí tuệ nhân tạo (AI) là lĩnh vực khoa học máy tính phát triển các hệ thống có khả năng thực hiện các nhiệm vụ đòi hỏi trí thông minh."
+  },
+  {
+    "id": 16,
+    "type": "true_false",
+    "difficulty": "easy",
+    "question": "Machine Learning (Học máy) là một nhánh chính của Trí tuệ nhân tạo (AI).",
+    "answer": true,
+    "explanation": "Văn bản liệt kê các nhánh chính của AI bao gồm Machine Learning, Deep Learning, NLP, Computer Vision, và Robotics."
+  },
+  {
+    "id": 17,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": "Nhánh nào của AI tập trung vào việc giúp máy tính hiểu và xử lý ngôn ngữ của con người?",
+    "options": [
+      "Computer Vision",
+      "Robotics",
+      "NLP (Xử lý ngôn ngữ tự nhiên)",
+      "Deep Learning"
+    ],
+    "correctIdx": 2,
+    "explanation": "NLP (Natural Language Processing) là nhánh của AI chuyên về xử lý ngôn ngữ tự nhiên."
+  },
+  {
+    "id": 18,
+    "type": "multiple_choice",
+    "difficulty": "hard",
+    "question": "Việc sử dụng AI để chẩn đoán bệnh qua hình ảnh y tế (như X-quang, MRI) là ứng dụng của nhánh nào?",
+    "options": [
+      "NLP (Xử lý ngôn ngữ tự nhiên)",
+      "Robotics",
+      "Computer Vision (Thị giác máy tính)",
+      "Machine Learning"
+    ],
+    "correctIdx": 2,
+    "explanation": "Computer Vision là nhánh AI tập trung vào nhận dạng và phân tích hình ảnh, ứng dụng điển hình là chẩn đoán bệnh qua hình ảnh y tế."
+  },
+  {
+    "id": 19,
+    "type": "true_false",
+    "difficulty": "medium",
+    "question": "RPA (Tự động hóa quy trình bằng robot) là một ứng dụng của AI, được sử dụng để tạo ra các robot vật lý thông minh.",
+    "answer": false,
+    "explanation": "RPA là ứng dụng AI để tự động hóa các quy trình công việc trên máy tính (robot phần mềm), không nhất thiết liên quan đến việc tạo ra robot vật lý."
+  },
+  {
+    "id": 20,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": "Internet vạn vật (IoT) được định nghĩa là gì?",
+    "options": [
+      "Một mạng xã hội dành cho các thiết bị điện tử.",
+      "Mạng lưới các máy tính cá nhân kết nối với nhau.",
+      "Mạng lưới các thiết bị vật lý được gắn cảm biến và kết nối internet để trao đổi dữ liệu.",
+      "Một loại phần mềm diệt virus mới."
+    ],
+    "correctIdx": 2,
+    "explanation": "IoT là mạng lưới các thiết bị vật lý được gắn cảm biến, phần mềm và kết nối internet để thu thập và trao đổi dữ liệu."
+  },
+  {
+    "id": 21,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": "Trong kiến trúc IoT, tầng nào chịu trách nhiệm xử lý và lưu trữ dữ liệu trên cloud?",
+    "options": [
+      "Tầng Thiết bị",
+      "Tầng Kết nối",
+      "Tầng Nền tảng",
+      "Tầng Ứng dụng"
+    ],
+    "correctIdx": 2,
+    "explanation": "Tầng Nền tảng (Platform Layer) trong kiến trúc IoT có chức năng xử lý và lưu trữ dữ liệu, thường là trên môi trường điện toán đám mây."
+  },
+  {
+    "id": 22,
+    "type": "true_false",
+    "difficulty": "medium",
+    "question": "5G và LoRaWAN là các công nghệ thuộc Tầng Ứng dụng của kiến trúc IoT.",
+    "answer": false,
+    "explanation": "Wi-Fi, Bluetooth, 5G, LoRaWAN là các công nghệ thuộc Tầng Kết nối (Connectivity Layer), dùng để truyền dữ liệu từ thiết bị."
+  },
+  {
+    "id": 23,
+    "type": "multiple_choice",
+    "difficulty": "hard",
+    "question": "Việc sử dụng cảm biến độ ẩm đất để kích hoạt hệ thống tưới tiêu là một ứng dụng của IoT trong lĩnh vực nào?",
+    "options": [
+      "Smart Home",
+      "Smart City",
+      "Công nghiệp 4.0",
+      "Nông nghiệp thông minh"
+    ],
+    "correctIdx": 3,
+    "explanation": "Sử dụng cảm biến độ ẩm và hệ thống tưới tự động là một ứng dụng điển hình của IoT trong Nông nghiệp thông minh."
+  },
+  {
+    "id": 24,
+    "type": "true_false",
+    "difficulty": "easy",
+    "question": "Việc giám sát máy móc từ xa và thực hiện bảo trì dự đoán trong nhà máy là một ứng dụng của IoT trong Công nghiệp 4.0.",
+    "answer": true,
+    "explanation": "Văn bản nêu rõ ứng dụng của IoT trong Công nghiệp 4.0 là 'Giám sát máy móc, bảo trì dự đoán'."
+  },
+  {
+    "id": 25,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": "Trong mô hình 5V của Big Data, chữ 'V' nào đại diện cho khối lượng dữ liệu khổng lồ?",
+    "options": [
+      "Volume",
+      "Velocity",
+      "Variety",
+      "Value"
+    ],
+    "correctIdx": 0,
+    "explanation": "Volume (Khối lượng) là đặc trưng chỉ khối lượng dữ liệu rất lớn của Big Data, có thể lên tới Terabyte, Petabyte."
+  },
+  {
+    "id": 26,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": "Đặc trưng nào của Big Data nói về sự đa dạng của các loại dữ liệu (có cấu trúc, phi cấu trúc, bán cấu trúc)?",
+    "options": [
+      "Volume",
+      "Velocity",
+      "Variety",
+      "Veracity"
+    ],
+    "correctIdx": 2,
+    "explanation": "Variety (Đa dạng) chỉ sự đa dạng về dạng dữ liệu mà Big Data phải xử lý, không chỉ giới hạn ở dữ liệu có cấu trúc."
+  },
+  {
+    "id": 27,
+    "type": "true_false",
+    "difficulty": "medium",
+    "question": "Trong mô hình 5V, 'Veracity' đề cập đến tốc độ sinh ra và xử lý dữ liệu.",
+    "answer": false,
+    "explanation": "'Veracity' đề cập đến độ chính xác và tin cậy của dữ liệu, trong khi 'Velocity' mới là đặc trưng về tốc độ."
+  },
+  {
+    "id": 28,
+    "type": "multiple_choice",
+    "difficulty": "hard",
+    "question": "Ngân hàng sử dụng hệ thống phân tích các giao dịch theo thời gian thực để cảnh báo các hoạt động đáng ngờ là ứng dụng Big Data trong lĩnh vực nào?",
+    "options": [
+      "Marketing",
+      "Y tế",
+      "Tài chính",
+      "Giáo dục"
+    ],
+    "correctIdx": 2,
+    "explanation": "Ứng dụng của Big Data trong lĩnh vực Tài chính bao gồm việc 'Phát hiện gian lận' thông qua phân tích dữ liệu giao dịch."
+  },
+  {
+    "id": 29,
+    "type": "true_false",
+    "difficulty": "easy",
+    "question": "Mục đích cuối cùng của việc phân tích Big Data là để tạo ra giá trị kinh doanh (Value).",
+    "answer": true,
+    "explanation": "Chữ 'V' cuối cùng trong mô hình 5V là 'Value' (Giá trị), nhấn mạnh rằng việc thu thập và phân tích dữ liệu lớn phải mang lại giá trị cụ thể cho tổ chức."
+  },
+  {
+    "id": 30,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": "Mô hình dịch vụ điện toán đám mây nào cung cấp phần mềm hoàn chỉnh cho người dùng cuối qua internet, ví dụ như Zoom hay Google Workspace?",
+    "options": [
+      "IaaS (Infrastructure as a Service)",
+      "PaaS (Platform as a Service)",
+      "SaaS (Software as a Service)",
+      "FaaS (Function as a Service)"
+    ],
+    "correctIdx": 2,
+    "explanation": "SaaS là mô hình cung cấp phần mềm qua internet. Google Workspace và Zoom là các ví dụ điển hình."
+  },
+  {
+    "id": 31,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": "Khi một công ty thuê máy ảo, không gian lưu trữ và tài nguyên mạng từ một nhà cung cấp đám mây, họ đang sử dụng mô hình dịch vụ nào?",
+    "options": [
+      "IaaS",
+      "PaaS",
+      "SaaS",
+      "Multi-Cloud"
+    ],
+    "correctIdx": 0,
+    "explanation": "IaaS (Hạ tầng như một dịch vụ) là mô hình cung cấp các tài nguyên hạ tầng CNTT cơ bản như máy ảo, lưu trữ, mạng."
+  },
+  {
+    "id": 32,
+    "type": "true_false",
+    "difficulty": "easy",
+    "question": "Mô hình thanh toán của Điện toán đám mây thường là trả phí theo mức độ sử dụng thực tế.",
+    "answer": true,
+    "explanation": "Điện toán đám mây là mô hình cung cấp tài nguyên CNTT qua internet theo yêu cầu, và người dùng 'trả phí theo mức sử dụng'."
+  },
+  {
+    "id": 33,
+    "type": "multiple_choice",
+    "difficulty": "hard",
+    "question": "Một doanh nghiệp kết hợp sử dụng đám mây công cộng (Public Cloud) cho các ứng dụng web và đám mây riêng (Private Cloud) để lưu trữ dữ liệu nhạy cảm. Đây là mô hình triển khai nào?",
+    "options": [
+      "Public Cloud",
+      "Private Cloud",
+      "Hybrid Cloud",
+      "Multi-Cloud"
+    ],
+    "correctIdx": 2,
+    "explanation": "Hybrid Cloud (Đám mây lai) là mô hình kết hợp giữa đám mây công cộng và đám mây riêng."
+  },
+  {
+    "id": 34,
+    "type": "true_false",
+    "difficulty": "medium",
+    "question": "Mô hình dịch vụ PaaS (Platform as a Service) cung cấp cho người dùng quyền kiểm soát hoàn toàn đối với hạ tầng vật lý bên dưới như máy chủ và trung tâm dữ liệu.",
+    "answer": false,
+    "explanation": "PaaS cung cấp một nền tảng để phát triển ứng dụng, người dùng không cần quản lý hạ tầng bên dưới. IaaS mới là mô hình cho phép quản lý hạ tầng ảo."
+  },
+  {
+    "id": 35,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": "Hình thức tấn công lừa đảo người dùng cung cấp thông tin nhạy cảm (như mật khẩu, thẻ tín dụng) thông qua email hoặc trang web giả mạo được gọi là gì?",
+    "options": [
+      "Malware",
+      "DDoS",
+      "Phishing",
+      "Data Breach"
+    ],
+    "correctIdx": 2,
+    "explanation": "Phishing được định nghĩa là hình thức lừa đảo qua email/web giả mạo để lấy thông tin nhạy cảm."
+  },
+  {
+    "id": 36,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": "Trụ cột nào trong bộ ba CIA của an toàn thông tin đảm bảo rằng dữ liệu không bị sửa đổi một cách trái phép?",
+    "options": [
+      "Confidentiality (Bí mật)",
+      "Integrity (Toàn vẹn)",
+      "Availability (Sẵn sàng)",
+      "Authentication (Xác thực)"
+    ],
+    "correctIdx": 1,
+    "explanation": "Integrity (Toàn vẹn) là trụ cột đảm bảo thông tin không bị sửa đổi trái phép trong quá trình lưu trữ hoặc truyền tải."
+  },
+  {
+    "id": 37,
+    "type": "true_false",
+    "difficulty": "medium",
+    "question": "Trụ cột 'Confidentiality' (Bí mật) của an toàn thông tin có nghĩa là hệ thống và dữ liệu phải luôn sẵn sàng để truy cập khi cần thiết.",
+    "answer": false,
+    "explanation": "Đó là định nghĩa của 'Availability' (Sẵn sàng). 'Confidentiality' (Bí mật) có nghĩa là chỉ những người có quyền mới được truy cập thông tin."
+  },
+  {
+    "id": 38,
+    "type": "multiple_choice",
+    "difficulty": "hard",
+    "question": "Một cuộc tấn công từ chối dịch vụ phân tán (DDoS) chủ yếu nhắm vào việc phá vỡ trụ cột nào của an toàn thông tin?",
+    "options": [
+      "Confidentiality (Bí mật)",
+      "Integrity (Toàn vẹn)",
+      "Availability (Sẵn sàng)",
+      "Non-repudiation (Chống chối bỏ)"
+    ],
+    "correctIdx": 2,
+    "explanation": "Tấn công DDoS làm quá tải hệ thống, khiến người dùng hợp pháp không thể truy cập được dịch vụ, do đó nó tấn công trực tiếp vào tính Sẵn sàng (Availability)."
+  },
+  {
+    "id": 39,
+    "type": "true_false",
+    "difficulty": "easy",
+    "question": "Ransomware là một loại phần mềm độc hại (Malware).",
+    "answer": true,
+    "explanation": "Văn bản định nghĩa Malware là phần mềm độc hại và liệt kê các ví dụ bao gồm virus, ransomware."
+  },
+  {
+    "id": 40,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": "Theo văn bản, 'Công dân số' là người như thế nào?",
+    "options": [
+      "Người có chứng minh nhân dân điện tử.",
+      "Người có kỹ năng sử dụng công nghệ số an toàn và hiệu quả.",
+      "Người chỉ sử dụng các dịch vụ công trực tuyến.",
+      "Người làm việc trong ngành công nghệ thông tin."
+    ],
+    "correctIdx": 1,
+    "explanation": "Xã hội số bao gồm 'Công dân số', được định nghĩa là người có kỹ năng sử dụng công nghệ."
+  },
+  {
+    "id": 41,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": "Một trong những mục tiêu chính của Chương trình CĐS quốc gia của Việt Nam đến năm 2025 là gì?",
+    "options": [
+      "Kinh tế số chiếm 50% GDP.",
+      "100% người dân sử dụng smartphone.",
+      "Kinh tế số chiếm 20% GDP.",
+      "Xóa bỏ hoàn toàn thủ tục hành chính giấy."
+    ],
+    "correctIdx": 2,
+    "explanation": "Văn bản nêu rõ mục tiêu của chương trình CĐS quốc gia đến 2025 là 'Kinh tế số chiếm 20% GDP'."
+  },
+  {
+    "id": 42,
+    "type": "true_false",
+    "difficulty": "medium",
+    "question": "Chính phủ điện tử là cấp độ phát triển cao hơn Chính phủ số, tập trung vào việc cung cấp dữ liệu mở.",
+    "answer": false,
+    "explanation": "Theo các cấp độ được liệt kê, Chính phủ số là cấp độ cao hơn Chính phủ điện tử. Chính phủ điện tử chỉ tin học hóa thủ tục, còn chính phủ số cung cấp dịch vụ số hóa toàn diện."
+  },
+  {
+    "id": 43,
+    "type": "multiple_choice",
+    "difficulty": "hard",
+    "question": "Điểm khác biệt chính của 'Chính phủ thông minh' so với các cấp độ chính phủ trước đó là gì?",
+    "options": [
+      "Cung cấp dịch vụ công trực tuyến.",
+      "Tin học hóa thủ tục hành chính.",
+      "Sử dụng AI để tự động hóa và đưa ra dự đoán.",
+      "Công khai, minh bạch hóa dữ liệu."
+    ],
+    "correctIdx": 2,
+    "explanation": "Cấp độ 'Chính phủ thông minh' được đặc trưng bởi việc ứng dụng các công nghệ tiên tiến như AI để tự động hóa, phân tích và dự đoán."
+  },
+  {
+    "id": 44,
+    "type": "true_false",
+    "difficulty": "easy",
+    "question": "Cơ sở dữ liệu quốc gia về dân cư là một trong những nền tảng quan trọng cho việc chuyển đổi số tại Việt Nam.",
+    "answer": true,
+    "explanation": "Văn bản đề cập đến 'Cơ sở dữ liệu quốc gia về dân cư' như một thành phần cốt lõi trong quá trình chuyển đổi số tại Việt Nam."
+  },
+  {
+    "id": 45,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": "Khái niệm nào mô tả một chính phủ hoạt động dựa trên dữ liệu và công nghệ số, cung cấp dịch vụ công trực tuyến một cách minh bạch và hiệu quả?",
+    "options": [
+      "Xã hội số",
+      "Kinh tế số",
+      "Chính phủ số",
+      "Công dân số"
+    ],
+    "correctIdx": 2,
+    "explanation": "Đây là định nghĩa của 'Chính phủ số': chính phủ hoạt động dựa trên dữ liệu và công nghệ số, cung cấp dịch vụ công trực tuyến, minh bạch và hiệu quả."
+  }
+]
