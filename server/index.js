@@ -821,7 +821,7 @@ app.post('/api/quiz-history', (req, res) => {
 })
 
 // API: Lấy lịch sử quiz (tất cả hoặc theo courseId)
-app.get('/api/quiz-history/:courseId?', (req, res) => {
+app.get(['/api/quiz-history', '/api/quiz-history/:courseId'], (req, res) => {
     try {
         const { courseId } = req.params
         let history = readQuizHistory()

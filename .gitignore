@@ -30,3 +30,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# ---------- Local Data & Cache ----------
+# Thư mục lưu file upload của server
+server/uploads/
+
+# Thư mục cache của AI
+server/ai-cache/
+
+# File cơ sở dữ liệu Vector DB và Lịch sử Quiz
+server/vector_db.json
+server/quiz-history.json
+
+# Bỏ qua các file .env trong server nếu có
+server/.env
+server/.env.*
+server/*.log
