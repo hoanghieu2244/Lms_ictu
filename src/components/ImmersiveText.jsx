@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { HiCheckCircle, HiXCircle } from 'react-icons/hi2'
 
-const API_URL = 'http://localhost:3001'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 export default function ImmersiveText({ courseId, lessonId, lesson }) {
     const [data, setData] = useState(null)

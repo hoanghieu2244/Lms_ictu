@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-const API_URL = 'http://localhost:3001'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 // Color palette for different depth levels
 const COLORS = [

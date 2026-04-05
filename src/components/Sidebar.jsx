@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 import { AppContext } from '../App'
 import { HiHome, HiAcademicCap, HiClipboardDocumentCheck, HiClock, HiDocumentText, HiChatBubbleLeftEllipsis, HiBell, HiChartBar, HiCog6Tooth, HiSparkles, HiDocumentArrowUp, HiCpuChip, HiChevronUpDown, HiClipboardDocumentList } from 'react-icons/hi2'
 
-const API_URL = 'http://localhost:3001'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 export default function Sidebar() {
     const { sidebarCollapsed, user } = useContext(AppContext)

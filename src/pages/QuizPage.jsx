@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { AppContext } from '../App'
 import { HiSparkles, HiCpuChip, HiArrowLeft, HiArrowPath, HiCheckCircle, HiXCircle, HiLightBulb, HiTrophy, HiClock, HiAcademicCap, HiClipboardDocumentList } from 'react-icons/hi2'
 
-const API_URL = 'http://localhost:3001'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 export default function QuizPage() {
     const { lessons, courses } = useContext(AppContext)

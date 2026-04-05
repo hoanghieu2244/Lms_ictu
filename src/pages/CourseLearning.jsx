@@ -6,7 +6,7 @@ import ImmersiveText from '../components/ImmersiveText'
 import MindmapView from '../components/MindmapView'
 import { HiCheckCircle, HiSparkles, HiDocumentText, HiXMark, HiChevronDoubleLeft, HiChevronDoubleRight } from 'react-icons/hi2'
 
-const API_URL = 'http://localhost:3001'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 const VIEW_MODES = [
     { id: 'source', icon: '📄', label: 'Source' },

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useContext } from 'react'
 import { AppContext } from '../App'
 import { HiDocumentArrowUp, HiXMark, HiDocumentText, HiCpuChip, HiCheckCircle, HiClock, HiAcademicCap, HiBookOpen } from 'react-icons/hi2'
 
-const API_URL = 'http://localhost:3001'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 export default function UploadPage() {
     const { courses, lessons } = useContext(AppContext)

@@ -10,7 +10,7 @@ const INITIAL_MESSAGES = [
     { role: 'bot', text: 'Xin chào! Bạn có thắc mắc hay câu hỏi nào cần giải đáp không?' },
 ]
 
-const API_URL = 'http://localhost:3001'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 export default function ChatPanel() {
     const { chatOpen, setChatOpen } = useContext(AppContext)
