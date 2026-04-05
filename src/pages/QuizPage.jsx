@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { AppContext } from '../App'
-import { HiSparkles, HiCpuChip, HiArrowLeft, HiArrowPath, HiCheckCircle, HiXCircle, HiLightBulb, HiTrophy, HiClock, HiAcademicCap, HiClipboardDocumentList } from 'react-icons/hi2'
+import { HiSparkles, HiCpuChip, HiArrowLeft, HiArrowPath, HiCheckCircle, HiXCircle, HiLightBulb, HiTrophy, HiClock, HiAcademicCap, HiClipboardDocumentList, HiChartBar } from 'react-icons/hi2'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -23,6 +23,11 @@ export default function QuizPage() {
     const [endTime, setEndTime] = useState(null)
     const historySaved = useRef(false)
 
+    // History states
+    const [showHistoryView, setShowHistoryView] = useState(false)
+    const [history, setHistory] = useState([])
+    const [historyLoading, setHistoryLoading] = useState(false)
+
     // Lấy tên môn học từ courses hoặc lessons
     const courseName = courses?.find(c => String(c.id) === String(courseId))?.name
         || lessons[courseId]?.courseName
@@ -37,6 +42,7 @@ export default function QuizPage() {
         setSubmitted(false)
         setShowResults(false)
         setEndTime(null)
+        setShowHistoryView(false)
 
         try {
             const courseContent = lessons[courseId]
@@ -84,6 +90,23 @@ export default function QuizPage() {
         }
     }
 
+    const fetchHistory = async () => {
+        setHistoryLoading(true)
+        try {
+            const res = await fetch(`${API_URL}/api/quiz-history/${courseId}`)
+            const data = await res.json()
+            setHistory(Array.isArray(data) ? data : [])
+        } catch (err) {
+            console.error('Lỗi lấy quiz history:', err)
+        } finally {
+            setHistoryLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        if (showHistoryView) fetchHistory()
+    }, [showHistoryView, courseId])
+
     useEffect(() => {
         fetchQuiz()
     }, [courseId])
@@ -126,6 +149,81 @@ export default function QuizPage() {
         )
     }
 
+    if (showHistoryView) {
+        const totalAttempts = history.length
+        const avgScore = totalAttempts > 0 ? Math.round(history.reduce((acc, h) => acc + (h.percent || 0), 0) / totalAttempts) : 0
+        const bestScore = totalAttempts > 0 ? Math.max(...history.map(h => h.percent || 0)) : 0
+        const totalTime = history.reduce((acc, h) => acc + (h.timeTaken || 0), 0)
+
+        const getGradeInfo = (percent) => {
+            if (percent >= 90) return { emoji: '🏆', label: 'Xuất sắc', color: '#10b981', bg: '#10b98115' }
+            if (percent >= 70) return { emoji: '🎉', label: 'Tốt', color: '#3b82f6', bg: '#3b82f615' }
+            if (percent >= 50) return { emoji: '👏', label: 'Khá', color: '#f59e0b', bg: '#f59e0b15' }
+            return { emoji: '💪', label: 'Cần cố gắng', color: '#ef4444', bg: '#ef444415' }
+        }
+
+        const formatDate = (dateStr) => {
+            const d = new Date(dateStr)
+            const diff = new Date() - d
+            if (Math.floor(diff / 60000) < 1) return 'Vừa xong'
+            if (Math.floor(diff / 60000) < 60) return `${Math.floor(diff / 60000)} phút trước`
+            if (Math.floor(diff / 3600000) < 24) return `${Math.floor(diff / 3600000)} giờ trước`
+            return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        }
+
+        return (
+            <div className="quiz-page-wrapper">
+                <div className="quiz-history-container" style={{ width: '100%', maxWidth: '800px', margin: '0 auto' }}>
+                    <div className="quiz-history-header">
+                        <div className="quiz-history-header-left">
+                            <button className="quiz-back-btn" onClick={() => setShowHistoryView(false)} style={{ marginRight: '1rem' }}>
+                                <HiArrowLeft />
+                            </button>
+                            <div>
+                                <h2>Lịch sử môn: {courseName}</h2>
+                                <p>Theo dõi tiến trình học tập qua các lần kiểm tra</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="quiz-history-stats">
+                        <div className="quiz-history-stat-card"><div className="stat-icon" style={{ background: '#6366f115', color: '#6366f1' }}><HiChartBar /></div><div className="stat-info"><span className="stat-value">{totalAttempts}</span><span className="stat-label">Lần làm</span></div></div>
+                        <div className="quiz-history-stat-card"><div className="stat-icon" style={{ background: '#10b98115', color: '#10b981' }}><HiTrophy /></div><div className="stat-info"><span className="stat-value">{avgScore}%</span><span className="stat-label">Trung bình</span></div></div>
+                        <div className="quiz-history-stat-card"><div className="stat-icon" style={{ background: '#f59e0b15', color: '#f59e0b' }}><HiSparkles /></div><div className="stat-info"><span className="stat-value">{bestScore}%</span><span className="stat-label">Cao nhất</span></div></div>
+                    </div>
+
+                    {historyLoading ? (
+                        <div className="quiz-history-loading"><div className="quiz-loading-dots"><span></span><span></span><span></span></div></div>
+                    ) : history.length === 0 ? (
+                        <div className="quiz-history-empty">
+                            <h3>Chưa có bài thi nào</h3>
+                            <button className="quiz-btn quiz-btn-primary" onClick={() => { setShowHistoryView(false); fetchQuiz(true) }}><HiSparkles /> Tạo đề mới ngay</button>
+                        </div>
+                    ) : (
+                        <div className="quiz-history-timeline">
+                            {history.map((entry, idx) => {
+                                const grade = getGradeInfo(entry.percent)
+                                return (
+                                    <div key={idx} className="quiz-history-card">
+                                        <div className="history-card-left"><div className="history-score-ring" style={{ borderColor: grade.color }}><span style={{ color: grade.color }}>{entry.percent}%</span></div></div>
+                                        <div className="history-card-body">
+                                            <div className="history-card-top"><h4>{entry.courseName}</h4><span className="history-grade-badge" style={{ background: grade.bg, color: grade.color }}>{grade.emoji} {grade.label}</span></div>
+                                            <div className="history-card-meta">
+                                                <span><HiCheckCircle style={{ color: '#10b981' }} /> {entry.score} đúng</span>
+                                                <span><HiXCircle style={{ color: '#ef4444' }} /> {entry.total - entry.score} sai</span>
+                                                <span className="history-date">{formatDate(entry.date)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    )}
+                </div>
+            </div>
+        )
+    }
+
     if (!quizData || quizData.length === 0) {
         return (
             <div className="quiz-page-wrapper">
@@ -133,9 +231,14 @@ export default function QuizPage() {
                     <div className="quiz-error-icon">📝</div>
                     <h3>Chưa có câu hỏi</h3>
                     <p>Chưa có câu hỏi cho môn này</p>
-                    <button className="quiz-btn quiz-btn-primary" onClick={() => fetchQuiz(true)}>
-                        <HiSparkles /> Tạo đề mới
-                    </button>
+                    <div className="quiz-error-actions" style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', justifyContent: 'center' }}>
+                        <button className="quiz-btn quiz-btn-primary" onClick={() => fetchQuiz(true)}>
+                            <HiSparkles /> Tạo đề mới
+                        </button>
+                        <button className="quiz-btn quiz-btn-outline" onClick={() => setShowHistoryView(true)}>
+                            <HiClipboardDocumentList /> Xem lịch sử
+                        </button>
+                    </div>
                 </div>
             </div>
         )
@@ -304,7 +407,7 @@ export default function QuizPage() {
                         <button className="quiz-btn quiz-btn-primary" onClick={() => { historySaved.current = false; fetchQuiz() }}>
                             <HiSparkles /> Bộ đề mới
                         </button>
-                        <button className="quiz-btn quiz-btn-outline" onClick={() => navigate('/dashboard/quiz-history')}>
+                        <button className="quiz-btn quiz-btn-outline" onClick={() => setShowHistoryView(true)}>
                             <HiClipboardDocumentList /> Lịch sử
                         </button>
                         <button className="quiz-btn quiz-btn-ghost" onClick={() => navigate('/dashboard/quiz')}>

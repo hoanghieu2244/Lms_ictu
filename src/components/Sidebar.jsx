@@ -110,10 +110,6 @@ export default function Sidebar() {
                     <span className="nav-icon"><HiSparkles /></span>
                     Quiz Generator
                 </NavLink>
-                <NavLink to="/dashboard/quiz-history" className={({ isActive }) => `nav-item agent-nav ${isActive ? 'active' : ''}`}>
-                    <span className="nav-icon"><HiClipboardDocumentList /></span>
-                    Lịch sử Quiz
-                </NavLink>
             </nav>
 
             {/* Model Selector */}

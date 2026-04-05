@@ -6,7 +6,6 @@ import Classes from './pages/Classes'
 import CourseLearning from './pages/CourseLearning'
 import QuizPage from './pages/QuizPage'
 import QuizSelectPage from './pages/QuizSelectPage'
-import QuizHistoryPage from './pages/QuizHistoryPage'
 import Dashboard from './pages/Dashboard'
 import UploadPage from './pages/UploadPage'
 import './index.css'
@@ -660,7 +659,6 @@ function App() {
             <Route path="dashboard/classes/learning/:courseId" element={<CourseLearning />} />
             <Route path="dashboard/quiz" element={<QuizSelectPage />} />
             <Route path="dashboard/quiz/:courseId" element={<QuizPage />} />
-            <Route path="dashboard/quiz-history" element={<QuizHistoryPage />} />
             <Route path="dashboard/results" element={<Dashboard />} />
             <Route path="dashboard/upload" element={<UploadPage />} />
           </Route>
