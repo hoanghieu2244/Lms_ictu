@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer'
 import multer from 'multer'
 import fs from 'fs'
 import dotenv from 'dotenv'
+import mammoth from 'mammoth'
 import { GoogleGenAI } from '@google/genai'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
@@ -12,6 +13,9 @@ import { initVectorDB, processDocument, searchKnowledgeBase, getDocumentTextByLe
 const AVAILABLE_MODELS = [
     { id: 'google/gemini-2.5-pro', name: 'Gemini 2.5 Pro', desc: '🧠 Suy luận mạnh nhất', speed: 'Chậm hơn', quality: 'Rất tốt' }
 ]
+
+// Model riêng cho Tutor Chat (rẻ hơn 16x so với Pro)
+const TUTOR_CHAT_MODEL = 'google/gemini-2.5-flash'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 dotenv.config({ path: join(__dirname, '.env') })
@@ -30,6 +34,7 @@ await initVectorDB()
 const UPLOADS_DIR = join(__dirname, 'uploads')
 const METADATA_FILE = join(UPLOADS_DIR, 'metadata.json')
 const QUIZ_HISTORY_FILE = join(__dirname, 'quiz-history.json')
+const ASSIGNMENTS_FILE = join(__dirname, 'assignments.json')
 const MAX_FILE_SIZE = 200 * 1024 * 1024 // 200MB
 
 // Ensure uploads dir exists
@@ -45,6 +50,11 @@ if (!fs.existsSync(METADATA_FILE)) {
 // Ensure quiz history file exists
 if (!fs.existsSync(QUIZ_HISTORY_FILE)) {
     fs.writeFileSync(QUIZ_HISTORY_FILE, JSON.stringify([], null, 2))
+}
+
+// Ensure assignments file exists
+if (!fs.existsSync(ASSIGNMENTS_FILE)) {
+    fs.writeFileSync(ASSIGNMENTS_FILE, JSON.stringify([], null, 2))
 }
 
 const TEMP_DIR = join(UPLOADS_DIR, '_temp')
@@ -421,129 +431,268 @@ app.get('/api/uploads', (req, res) => {
 // AI AGENT APIS (GEMINI 2.5)
 // ============================================
 
-// API: Tutor Chat (Gemini 2.5 Flash for speed)
-app.post('/api/chat', async (req, res) => {
-    try {
-        const { messages, context } = req.body
+// ============================================
+// TUTOR CHAT + AI GRADING (Tích hợp)
+// Flash cho chat thường, Pro cho chấm bài
+// ============================================
 
-        if (!process.env.OPENROUTER_API_KEY) {
-            return res.status(500).json({ error: 'OPENROUTER_API_KEY is not configured' })
-        }
-
-        // Format history for Gemini SDK
-        const formattedHistory = messages.map(m => ({
-            role: m.role === 'user' ? 'user' : 'model',
-            parts: [{ text: m.content }]
-        }))
-
-        // Extract the latest message and history
-        let latestMessage = "Xin chào"
-        let history = []
-        if (formattedHistory.length > 0) {
-            const lastMsg = formattedHistory.pop()
-            latestMessage = lastMsg.parts[0].text
-            history = formattedHistory
-        }
-
-        // --- ROUTE-BASED RAG: Phân loại ý định (Intent Classification) ---
-        const routePrompt = `Phân loại ý định của câu nói sau đây thành 1 trong 2 loại:
-1. "SEARCH": Câu hỏi về kiến thức, học tập, cần tra cứu tài liệu bài giảng. (Ví dụ: Định nghĩa X là gì? Vì sao Y lại thế? Giải thích bài 2)
-2. "CHAT": Câu giao tiếp thông thường, chào hỏi, cảm ơn, tán gẫu, hoặc yêu cầu chung chung vẽ biểu đồ. (Ví dụ: Chào bạn, bạn tên gì, vẽ sơ đồ tư duy)
-
-Trả về CHỈ một từ "SEARCH" hoặc "CHAT". KHÔNG giải thích thêm.
-Câu nói: "${latestMessage}"`
-
-        let intent = 'SEARCH' // Default fallback
-        try {
-            const routeRes = await ai.models.generateContent({
-                model: currentModel,
-                contents: routePrompt,
-                config: { temperature: 0.1 }
-            })
-            const intentText = routeRes.text?.trim().toUpperCase() || ''
-            if (intentText.includes('CHAT')) intent = 'CHAT'
-        } catch (e) { console.error('Lỗi Router RAG:', e.message) }
-
-        // Tìm kiếm tài liệu RAG tương ứng với tin nhắn mới nhất
-        let ragContext = ''
-        if (intent === 'SEARCH') {
-            console.log(`🔍 [Intent=SEARCH] Tìm kiếm RAG cho câu hỏi: "${latestMessage}"`)
-            try {
-                const relevantDocs = await searchKnowledgeBase(latestMessage, 3)
-                if (relevantDocs.length > 0) {
-                    console.log(`✅ Tìm thấy ${relevantDocs.length} đoạn kiến thức phù hợp!`)
-                    ragContext = '\n\nKIẾN THỨC BỔ SUNG TỪ TÀI LIỆU ĐÃ UPLOAD (KNOWLEDGE BASE):\n' +
-                        relevantDocs.map((doc, i) => `[Tài liệu ${i + 1} - ${doc.filename} (Trang ${doc.page})]: ${doc.text}`).join('\n\n')
-                } else {
-                    console.log('⚠️ Không tìm thấy tài liệu liên quan trong DB.')
-                }
-            } catch (ragErr) {
-                console.error('⚠️ RAG Search failed, AI sẽ trả lời bằng kiến thức chung:', ragErr.message)
-            }
+// Multer cho chat upload (docx, txt)
+const chatUploadStorage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, TEMP_DIR),
+    filename: (req, file, cb) => {
+        const utf8Name = Buffer.from(file.originalname, 'latin1').toString('utf8')
+        const safeName = utf8Name.replace(/[^a-zA-Z0-9.\-_\u00C0-\u024F\u1E00-\u1EFF]/g, '_')
+        cb(null, `chat_${Date.now()}_${safeName}`)
+    }
+})
+const chatUpload = multer({
+    storage: chatUploadStorage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max cho chat
+    fileFilter: (req, file, cb) => {
+        const allowed = [
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+            'text/plain', // .txt
+            'application/msword', // .doc
+            'image/png',
+            'image/jpeg',
+            'image/jpg',
+            'image/webp'
+        ]
+        if (allowed.includes(file.mimetype) || file.originalname.endsWith('.txt')) {
+            cb(null, true)
         } else {
-            console.log(`💬 [Intent=CHAT] Bỏ qua RAG (Tiết kiệm Token & DB) cho: "${latestMessage}"`)
+            cb(new Error('Chat chỉ hỗ trợ file .docx, .txt và hình ảnh (png/jpg/webp)'))
         }
+    }
+})
 
-        const systemMessage = `Bạn là một trợ lý AI học tập (Tutor Chat Agent) thân thiện và thông minh của hệ thống LMS ICTU.
+// Hàm trích xuất text từ file upload
+async function extractTextFromFile(filePath, mimetype, originalname) {
+    try {
+        if (mimetype === 'text/plain' || originalname?.endsWith('.txt')) {
+            return fs.readFileSync(filePath, 'utf-8')
+        }
+        if (mimetype?.includes('word') || originalname?.endsWith('.docx')) {
+            const result = await mammoth.extractRawText({ path: filePath })
+            return result.value
+        }
+        return null
+    } catch (e) {
+        console.error('Lỗi đọc file:', e.message)
+        return null
+    }
+}
 
-## QUY TRÌNH CHAIN OF THOUGHT (BẮT BUỘC TUÂN THỦ):
-Khi trả lời câu hỏi liên quan đến kiến thức/tài liệu, bạn PHẢI tuân theo quy trình sau:
+// Hàm xử lý chat logic chung (dùng cho cả /api/chat và /api/chat-upload)
+async function handleTutorChat({ messages, context, fileText, fileName, imageBase64 }) {
+    if (!process.env.OPENROUTER_API_KEY) {
+        throw new Error('OPENROUTER_API_KEY is not configured')
+    }
 
-**BƯỚC 1: LIỆT KÊ ĐẦU MỤC** (Internal reasoning)
-- Đọc kỹ tài liệu/ngữ cảnh được cung cấp
-- Liệt kê TẤT CẢ các đầu mục, khái niệm, ý chính tìm thấy
-- Đánh số thứ tự để đảm bảo không bỏ sót
+    // Format history for Gemini SDK
+    const formattedHistory = messages.map(m => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.content }]
+    }))
 
-**BƯỚC 2: PHÂN TÍCH TỪNG MỤC**
-- Đi qua từng đầu mục đã liệt kê
-- Giải thích chi tiết, đưa ví dụ minh họa
-- Liên kết các ý với nhau
+    // Extract the latest message and history
+    let latestMessage = "Xin chào"
+    let history = []
+    if (formattedHistory.length > 0) {
+        const lastMsg = formattedHistory.pop()
+        latestMessage = lastMsg.parts[0].text
+        history = formattedHistory
+    }
 
-**BƯỚC 3: TỔNG HỢP TRẢ LỜI**
-- Tổng hợp lại thành câu trả lời hoàn chỉnh
-- Trích dẫn nguồn cụ thể
+    let messageContent = latestMessage
 
----
+    // Nếu có file đính kèm, gắn nội dung file vào message
+    if (fileText) {
+        messageContent = `${latestMessage}\n\n📎 NỘI DUNG FILE "${fileName}":\n\`\`\`\n${fileText.substring(0, 30000)}\n\`\`\``
+    } else if (imageBase64) {
+        messageContent = [
+            { type: "text", text: latestMessage + `\n\n📎 Đính kèm hình ảnh: ${fileName}` },
+            { type: "image_url", image_url: { url: imageBase64 } }
+        ];
+    }
 
-## NHIỆM VỤ CHÍNH:
-- Giải đáp thắc mắc của sinh viên về bài giảng
-- Giải thích khái niệm khó hiểu
+    // --- ROUTE-BASED RAG: Phân loại ý định (Intent Classification) ---
+    const routePrompt = `Phân loại ý định của câu nói sau đây thành 1 trong 3 loại:
+1. "SEARCH": Câu hỏi về kiến thức, học tập, cần tra cứu tài liệu bài giảng. (Ví dụ: Định nghĩa X là gì? Vì sao Y lại thế? Giải thích bài 2)
+2. "GRADE": Yêu cầu chấm bài, đánh giá code, nhận xét bài làm, review code, chấm điểm. (Ví dụ: chấm bài này, đánh giá code, review bài làm, cho điểm, chấm điểm bài tập)
+3. "CHAT": Câu giao tiếp thông thường, chào hỏi, cảm ơn, tán gẫu. (Ví dụ: Chào bạn, bạn tên gì)
+
+Trả về CHỈ một từ "SEARCH", "GRADE" hoặc "CHAT". KHÔNG giải thích thêm.
+Câu nói: "${latestMessage.substring(0, 500)}"`
+
+    let intent = 'SEARCH' // Default fallback
+    try {
+        const routeRes = await ai.models.generateContent({
+            model: TUTOR_CHAT_MODEL,
+            contents: routePrompt,
+            config: { temperature: 0.1 }
+        })
+        const intentText = routeRes.text?.trim().toUpperCase() || ''
+        if (intentText.includes('GRADE')) intent = 'GRADE'
+        else if (intentText.includes('CHAT')) intent = 'CHAT'
+    } catch (e) { console.error('Lỗi Router RAG:', e.message) }
+
+    // Nếu có file đính kèm (hoặc ảnh) → mặc định coi là GRADE
+    if ((fileText || imageBase64) && intent !== 'GRADE') {
+        intent = 'GRADE'
+        console.log('📎 [File/Image detected] Tự động chuyển intent → GRADE')
+    }
+
+    // Tìm kiếm tài liệu RAG
+    let ragContext = ''
+    if (intent === 'SEARCH') {
+        console.log(`🔍 [Intent=SEARCH] Tìm kiếm RAG cho: "${latestMessage.substring(0, 60)}"`)
+        try {
+            const relevantDocs = await searchKnowledgeBase(latestMessage, 3)
+            if (relevantDocs.length > 0) {
+                console.log(`✅ Tìm thấy ${relevantDocs.length} đoạn kiến thức phù hợp!`)
+                ragContext = '\n\nKIẾN THỨC BỔ SUNG TỪ TÀI LIỆU ĐÃ UPLOAD (KNOWLEDGE BASE):\n' +
+                    relevantDocs.map((doc, i) => `[Tài liệu ${i + 1} - ${doc.filename} (Trang ${doc.page})]: ${doc.text}`).join('\n\n')
+            }
+        } catch (ragErr) {
+            console.error('⚠️ RAG Search failed:', ragErr.message)
+        }
+    } else if (intent === 'CHAT') {
+        console.log(`💬 [Intent=CHAT] Bỏ qua RAG cho: "${latestMessage.substring(0, 60)}"`)
+    }
+
+    // Chọn model + system prompt theo intent
+    let selectedModel = TUTOR_CHAT_MODEL
+    let systemMessage = ''
+
+    if (intent === 'GRADE') {
+        // === CHẾ ĐỘ CHẤM BÀI: Dùng Gemini Pro (chính xác hơn) ===
+        selectedModel = currentModel // Gemini 2.5 Pro
+        console.log(`📝 [Intent=GRADE] Chấm bài — dùng model: ${selectedModel} (Pro)`)
+
+        systemMessage = `Bạn là một Gia sư AI thân thiết của hệ thống LMS ICTU. Nhiệm vụ: CHẤM ĐIỂM bài làm của sinh viên một cách tự nhiên, gần gũi như một người anh/chị đi trước.
+
+## QUY TẮC TRẢ LỜI (TUYỆT ĐỐI TUÂN THỦ):
+1. Bắt đầu bằng những câu giao tiếp tự nhiên đời thường, ví dụ: "Chào em. Bài này em làm quá chuẩn luôn...", "Chào em, bài này em làm khá ổn rồi nhưng còn vài chỗ cần chú ý..."
+2. BỎ NGAY lập tức các câu dập khuôn máy móc như "Giảng viên đã nhận được câu hỏi... Theo vai trò là Giảng viên AI...".
+3. KHÔNG ĐƯỢC LIỆT KÊ TỪNG TIÊU CHÍ CHẤM ĐIỂM DÀI DÒNG.
+4. NẾU CÓ LỖI SAI (RẤT QUAN TRỌNG): Bạn BẮT BUỘC phải giải thích rõ TẠI SAO sai, SỬA LẠI như thế nào, và đặc biệt phải GỢI Ý sinh viên đọc lại kiến thức này ở bài nào, trang nào, hoặc môn nào (dựa vào dữ liệu RAG hoặc tên bài trong định hướng môn học).
+5. Cuối bài, đưa ra một số điểm trên thang 10.
+
+## ĐỊNH DẠNG TRẢ LỜI ĐỀ XUẤT:
+(Mở đoạn chào hỏi và đánh giá tổng quan tự nhiên)
+
+**Điểm: X/10** [emoji phù hợp]
+
+**✅ Điểm tốt:** (Khen ngợi điểm tốt nhất của bài làm trong 1-2 câu)
+
+**⚠️ Chỗ cần sửa & Ôn tập:** (Nếu có lỗi, giải thích rõ: Vì sao sai? Sửa thế nào? Xem lại lý thuyết ở đâu?)
+
+## LƯU Ý:
+- Chấm CÔNG TÂM. Trả lời bằng tiếng Việt.
+- NHẮC LẠI: Phải đưa ra được reference (chỉ điểm kiến thức) để học sinh biết đường xem lại.
+
+Context môn học: ${context || 'Không rõ'}
+${ragContext}`
+
+    } else {
+        // === CHẾ ĐỘ GIA SƯ THƯỜNG: Dùng Flash (rẻ) ===
+        console.log(`🎓 [Intent=${intent}] Tutor Chat — dùng model: ${TUTOR_CHAT_MODEL} (Flash)`)
+
+        systemMessage = `Bạn là một Gia sư AI thân thiết và tự nhiên của hệ thống LMS ICTU. Bạn đóng vai trò một người hướng dẫn học tập (như đàn anh/đàn chị).
+
+## QUY TẮC GIAO TIẾP VÀNG:
+1. Xưng hô tự nhiên: Bắt đầu bằng "Chào em. Để làm được bài này em cần..." Không dùng văn phong robot như "Tôi là AI...", "Theo lập trình của tôi...". Không xưng "Giảng viên".
+2. Bỏ các form mẫu dập khuôn mào đầu. Vào thẳng vấn đề một cách gần gũi.
+
+## VAI TRÒ CỐT LÕI — GIA SƯ HƯỚNG DẪN:
+1. **Khi hướng dẫn giải bài**: Tuyệt đối không giải thẳng đáp án. Phân tích đề bài, vạch ra các bước (Step 1, Step 2...).
+2. **KHI SINH VIÊN LÀM SAI (QUAN TRỌNG NHẤT)**: Bạn BẮT BUỘC phải làm đủ 3 việc sau:
+   - Giải thích TẠI SAO sai.
+   - Hướng dẫn CÁCH SỬA lại cho đúng.
+   - CHỈ ĐIỂM LIÊN KẾT (Reference): Dặn dò sinh viên đọc lại kiến thức này ở bìa nào, trang nào, chương mấy (Dựa trên nội dung môn học và RAG có sẵn). Ví dụ: "Phần này em đang bị hổng kiến thức, em có thể đọc lại Slide Bài 3 của môn X nhé."
+   
+3. **Khi hỏi kiến thức lý thuyết**: Giải thích dễ hiểu, đời thường, đưa ra ví dụ thực tế.
 
 ## PHONG CÁCH:
-- Sư phạm, thân thiện, dùng emoji hợp lý
-- Trả lời ngắn gọn súc tích dễ hiểu
-
-## QUY ĐỊNH NGHIÊM NGẶT:
-- ƯU TIÊN TRẢ LỜI dựa trên [Kiến thức bổ sung từ tài liệu] nếu có
-- BẮT BUỘC TRÍCH DẪN NGUỒN (VD: "Theo tài liệu Bài_giảng.pdf (Trang 5)...")
-- Nếu không có trong tài liệu, hãy trả lời bằng kiến thức thông thường
+- Sư phạm, thân thiện, dùng emoji nhưng đừng lạm dụng (📌💡🎯).
+- Ưu tiên dùng [Kiến thức bổ sung từ tài liệu] để trích dẫn nguồn cho sinh viên tiện tra cứu.
+- Hãy khép lại bằng một lời nhắn tạo động lực: "Em thử sửa lại rồi gửi anh/chị xem nha!"
 
 ## KỸ NĂNG VẼ BIỂU ĐỒ:
-- Biểu đồ Usecase, Flowchart, Mindmap, Sequence → dùng \`\`\`mermaid
-- Biểu đồ Dữ liệu (Tròn, Cột, Line, Radar...) → dùng \`\`\`echarts với JSON đúng chuẩn
+- Flowchart, Mindmap, Sequence → dùng \`\`\`mermaid
+- Biểu đồ Dữ liệu (Tròn, Cột, Line) → dùng \`\`\`echarts với JSON đúng chuẩn
 
 ---
 
 Context môn học hiện tại: ${context || 'Không có dữ liệu ngữ cảnh cụ thể'}
 ${ragContext}`
+    }
 
-        const chat = ai.chats.create({
-            model: currentModel,
-            config: {
-                systemInstruction: systemMessage,
-                temperature: 0.7,
-            },
-            history: history.length > 0 ? history : undefined,
-        })
+    const chat = ai.chats.create({
+        model: selectedModel,
+        config: {
+            systemInstruction: systemMessage,
+            temperature: intent === 'GRADE' ? 0.2 : 0.7,
+        },
+        history: history.length > 0 ? history : undefined,
+    })
 
-        const response = await chat.sendMessage({
-            message: latestMessage
-        })
+    const response = await chat.sendMessage({
+        message: messageContent
+    })
 
-        res.json({ text: response.text })
+    return response.text
+}
+
+// API: Tutor Chat (text only)
+app.post('/api/chat', async (req, res) => {
+    try {
+        const { messages, context } = req.body
+        const text = await handleTutorChat({ messages, context })
+        res.json({ text })
     } catch (err) {
-        console.error('❌ Lỗi Gemini Chat:', err)
+        console.error('❌ Lỗi Tutor Chat:', err)
         res.status(500).json({ error: 'Không thể xử lý yêu cầu chat lúc này' })
+    }
+})
+
+// API: Tutor Chat + File Upload (docx/txt/img)
+app.post('/api/chat-upload', chatUpload.single('file'), async (req, res) => {
+    try {
+        const { messages, context } = JSON.parse(req.body.data || '{}')
+        let fileText = null
+        let fileName = null
+        let imageBase64 = null
+
+        if (req.file) {
+            fileName = Buffer.from(req.file.originalname, 'latin1').toString('utf8')
+            console.log(`📎 [Chat Upload] Đọc file: ${fileName}`)
+
+            if (req.file.mimetype.startsWith('image/')) {
+                const b64 = fs.readFileSync(req.file.path).toString('base64');
+                imageBase64 = `data:${req.file.mimetype};base64,${b64}`;
+            } else {
+                fileText = await extractTextFromFile(req.file.path, req.file.mimetype, fileName)
+                
+                if (!fileText || !fileText.trim()) {
+                    try { fs.unlinkSync(req.file.path) } catch (e) { }
+                    return res.status(400).json({ error: 'Không thể đọc nội dung file text. Hãy thử file .docx hoặc .txt khác.' })
+                }
+                console.log(`✅ Đã trích xuất ${fileText.length} ký tự từ file text`)
+            }
+
+            // Cleanup temp file
+            try { fs.unlinkSync(req.file.path) } catch (e) { }
+        }
+
+        const text = await handleTutorChat({ messages, context, fileText, fileName, imageBase64 })
+        res.json({ text })
+    } catch (err) {
+        // Cleanup temp file on error
+        if (req.file) try { fs.unlinkSync(req.file.path) } catch (e) { }
+        console.error('❌ Lỗi Chat Upload:', err)
+        res.status(500).json({ error: err.message || 'Không thể xử lý yêu cầu' })
     }
 })
 
@@ -658,14 +807,13 @@ app.post('/api/generate-quiz', async (req, res) => {
             return res.status(400).json({ error: 'Không có dữ liệu bài giảng để tạo quiz. Vui lòng upload tài liệu trước.' })
         }
 
-        // Tính số câu cần tạo dựa trên lượng nội dung
+        // Tính số câu cần tạo (Giảm số lượng để phản hồi nhanh hơn, AI sinh JSON quá dài sẽ bị chậm)
         const textLength = finalText.length
-        let bankSize = 40 // default
-        if (textLength < 1000) bankSize = 15
-        else if (textLength < 3000) bankSize = 25
-        else if (textLength < 6000) bankSize = 35
-        else if (textLength < 10000) bankSize = 45
-        else bankSize = 55
+        let bankSize = 20 // default: tạo thẳng 20 câu để thi luôn
+        if (textLength < 1000) bankSize = 10
+        else if (textLength < 3000) bankSize = 15
+        else if (textLength < 6000) bankSize = 20
+        else bankSize = 25 // Tối đa 25 câu để tiết kiệm thời gian phản hồi trúc JSON
 
         console.log(`🤖 Generating quiz cho courseId=${courseId} (${bankSize} câu, text=${textLength} chars)...`)
 
@@ -1233,9 +1381,213 @@ ${sourceDataNote}`
     }
 })
 
+// ============================================
+// ASSIGNMENT & AI AUTO-GRADER SYSTEM
+// ============================================
+
+function readAssignments() {
+    try {
+        return JSON.parse(fs.readFileSync(ASSIGNMENTS_FILE, 'utf-8'))
+    } catch (e) {
+        return []
+    }
+}
+
+function writeAssignments(data) {
+    fs.writeFileSync(ASSIGNMENTS_FILE, JSON.stringify(data, null, 2))
+}
+
+// API: Tạo bài tập mới (Giảng viên)
+app.post('/api/assignments', async (req, res) => {
+    try {
+        const { courseId, courseName, title, description, dueDate } = req.body
+
+        if (!courseId || !title || !description) {
+            return res.status(400).json({ error: 'Thiếu courseId, title hoặc description' })
+        }
+
+        // AI tự động sinh Rubric từ đề bài
+        let rubric = ''
+        try {
+            console.log(`🤖 [Auto-Rubric] Đang tạo tiêu chí chấm điểm cho: "${title}"`)
+            const rubricPrompt = `Bạn là một giảng viên đại học chuyên nghiệp. Dựa vào đề bài tập sau đây, hãy tạo ra TIÊU CHÍ CHẤM ĐIỂM (Rubric) chi tiết trên thang điểm 10.
+
+ĐỀ BÀI:
+${description}
+
+Hãy trả về Rubric dưới dạng danh sách gạch đầu dòng, mỗi dòng gồm: Tên tiêu chí + Điểm tối đa.
+Tổng điểm tất cả tiêu chí PHẢI BẰNG ĐÚNG 10.
+
+Ví dụ format:
+- Đúng logic/thuật toán: 4 điểm
+- Trình bày code rõ ràng, có comment: 2 điểm  
+- Xử lý edge cases: 2 điểm
+- Đặt tên biến/hàm dễ hiểu: 1 điểm
+- Code chạy không lỗi: 1 điểm
+
+Chỉ trả về danh sách Rubric, KHÔNG giải thích thêm.`
+
+            const rubricRes = await ai.models.generateContent({
+                model: currentModel,
+                contents: rubricPrompt,
+                config: { temperature: 0.3 }
+            })
+            rubric = rubricRes.text?.trim() || ''
+            console.log(`✅ [Auto-Rubric] Đã tạo xong tiêu chí chấm điểm`)
+        } catch (e) {
+            console.error('⚠️ Lỗi tạo rubric tự động:', e.message)
+            rubric = '- Hoàn thành đúng yêu cầu: 5 điểm\n- Trình bày rõ ràng: 3 điểm\n- Sáng tạo: 2 điểm'
+        }
+
+        const assignment = {
+            id: Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6),
+            courseId: String(courseId),
+            courseName: courseName || '',
+            title,
+            description,
+            rubric,
+            dueDate: dueDate || null,
+            submissions: [],
+            createdAt: new Date().toISOString()
+        }
+
+        const assignments = readAssignments()
+        assignments.unshift(assignment)
+        writeAssignments(assignments)
+
+        console.log(`📝 Assignment created: "${title}" for course ${courseId}`)
+        res.json({ success: true, assignment })
+    } catch (err) {
+        console.error('❌ Lỗi tạo assignment:', err)
+        res.status(500).json({ error: 'Không thể tạo bài tập' })
+    }
+})
+
+// API: Lấy danh sách bài tập theo courseId
+app.get('/api/assignments/:courseId', (req, res) => {
+    const { courseId } = req.params
+    const assignments = readAssignments().filter(a => a.courseId === String(courseId))
+    res.json(assignments)
+})
+
+// API: Lấy chi tiết 1 bài tập
+app.get('/api/assignment/:id', (req, res) => {
+    const { id } = req.params
+    const assignment = readAssignments().find(a => a.id === id)
+    if (!assignment) return res.status(404).json({ error: 'Không tìm thấy bài tập' })
+    res.json(assignment)
+})
+
+// API: Cập nhật Rubric (Giảng viên sửa tiêu chí)
+app.put('/api/assignments/:id/rubric', (req, res) => {
+    const { id } = req.params
+    const { rubric } = req.body
+    const assignments = readAssignments()
+    const idx = assignments.findIndex(a => a.id === id)
+    if (idx === -1) return res.status(404).json({ error: 'Không tìm thấy bài tập' })
+    assignments[idx].rubric = rubric
+    writeAssignments(assignments)
+    res.json({ success: true, rubric })
+})
+
+// API: Sinh viên nộp bài + AI chấm điểm tự động
+app.post('/api/assignments/:id/submit', async (req, res) => {
+    try {
+        const { id } = req.params
+        const { studentName, studentId, submissionText } = req.body
+
+        if (!submissionText || !submissionText.trim()) {
+            return res.status(400).json({ error: 'Chưa có nội dung bài làm' })
+        }
+
+        const assignments = readAssignments()
+        const idx = assignments.findIndex(a => a.id === id)
+        if (idx === -1) return res.status(404).json({ error: 'Không tìm thấy bài tập' })
+
+        const assignment = assignments[idx]
+
+        // === GỌI AI CHẤM ĐIỂM ===
+        console.log(`🤖 [AI Grading] Đang chấm bài "${assignment.title}" cho SV ${studentName || 'N/A'}...`)
+
+        const gradingPrompt = `Bạn là một giảng viên đại học công tâm và chặt chẽ. Hãy chấm điểm bài làm của sinh viên dưới đây.
+
+## ĐỀ BÀI:
+${assignment.description}
+
+## TIÊU CHÍ CHẤM ĐIỂM (RUBRIC) — Thang điểm 10:
+${assignment.rubric}
+
+## BÀI LÀM CỦA SINH VIÊN:
+${submissionText}
+
+## YÊU CẦU:
+1. Đánh giá bài làm dựa CHÍNH XÁC theo từng tiêu chí trong Rubric
+2. Cho điểm từng tiêu chí, sau đó tính tổng
+3. Tổng điểm tối đa là 10
+4. Viết nhận xét chi tiết (chỉ ra điểm tốt + điểm cần cải thiện)
+
+Trả về KẾT QUẢ dưới dạng JSON:
+{
+  "diem": <số điểm từ 0.0 đến 10.0>,
+  "chiTiet": ["Tiêu chí 1: X/Y điểm - Lý do", "Tiêu chí 2: X/Y điểm - Lý do"],
+  "nhanXet": "Nhận xét tổng quan ngắn gọn về bài làm",
+  "diemManh": "Điểm mạnh của bài làm",
+  "canCaiThien": "Những điểm cần cải thiện"
+}`
+
+        const gradeRes = await ai.models.generateContent({
+            model: currentModel, // Dùng Gemini 2.5 Pro cho chấm điểm (chính xác)
+            contents: gradingPrompt,
+            config: {
+                temperature: 0.2,
+                responseMimeType: 'application/json'
+            }
+        })
+
+        let gradeResult = {}
+        try {
+            gradeResult = JSON.parse(gradeRes.text)
+        } catch (e) {
+            console.error('Lỗi parse grading JSON:', gradeRes.text?.substring(0, 300))
+            gradeResult = { diem: 0, nhanXet: 'Lỗi hệ thống khi chấm điểm. Vui lòng thử lại.', chiTiet: [], diemManh: '', canCaiThien: '' }
+        }
+
+        // Lưu submission + kết quả
+        const submission = {
+            id: Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 4),
+            studentName: studentName || 'Sinh viên',
+            studentId: studentId || '',
+            submissionText: submissionText.substring(0, 50000), // Giới hạn 50k ký tự
+            grade: gradeResult,
+            submittedAt: new Date().toISOString()
+        }
+
+        assignments[idx].submissions.unshift(submission)
+        writeAssignments(assignments)
+
+        console.log(`✅ [AI Grading] Đã chấm xong: ${gradeResult.diem}/10 — "${assignment.title}"`)
+
+        res.json({ success: true, submission })
+    } catch (err) {
+        console.error('❌ Lỗi AI Grading:', err)
+        res.status(500).json({ error: 'Lỗi trong quá trình chấm điểm' })
+    }
+})
+
+// API: Lấy lịch sử nộp bài của 1 assignment
+app.get('/api/assignments/:id/submissions', (req, res) => {
+    const { id } = req.params
+    const assignment = readAssignments().find(a => a.id === id)
+    if (!assignment) return res.status(404).json({ error: 'Không tìm thấy bài tập' })
+    res.json(assignment.submissions || [])
+})
+
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`\n🚀 LMS API Server đang chạy: http://localhost:${PORT}`)
-    console.log(`   POST /api/send-otp    — Gửi mã OTP`)
-    console.log(`   POST /api/verify-otp  — Xác thực OTP\n`)
+    console.log(`   POST /api/send-otp         — Gửi mã OTP`)
+    console.log(`   POST /api/verify-otp        — Xác thực OTP`)
+    console.log(`   POST /api/chat              — Tutor Chat (Flash)`)
+    console.log(`   POST /api/assignments       — Tạo bài tập + AI Rubric`)
+    console.log(`   POST /api/assignments/:id/submit — Nộp bài + AI Chấm điểm\n`)
 })
