@@ -163,7 +163,7 @@ LƯU Ý QUAN TRỌNG:
 - Ưu tiên chất lượng hơn số lượng`
 
     const response = await ai.models.generateContent({
-        model: 'google/gemini-2.5-pro',
+        model: 'openai/gpt-4o',
         contents: prompt,
         config: {
             temperature: 0.3,
@@ -226,7 +226,7 @@ ${fullText.substring(0, 8000)}
 }`
 
     const response = await ai.models.generateContent({
-        model: 'google/gemini-2.5-pro',
+        model: 'openai/gpt-4o',
         contents: prompt,
         config: {
             temperature: 0.3,

@@ -11,11 +11,11 @@ import { dirname, join } from 'path'
 import { initVectorDB, processDocument, searchKnowledgeBase, getDocumentTextByLesson } from './ragService.js'
 
 const AVAILABLE_MODELS = [
-    { id: 'google/gemini-2.5-pro', name: 'Gemini 2.5 Pro', desc: '🧠 Suy luận mạnh nhất', speed: 'Chậm hơn', quality: 'Rất tốt' }
+    { id: 'openai/gpt-4o', name: 'GPT-4o', desc: '🧠 Suy luận mạnh nhất', speed: 'Nhanh', quality: 'Rất tốt' }
 ]
 
-// Model riêng cho Tutor Chat (rẻ hơn 16x so với Pro)
-const TUTOR_CHAT_MODEL = 'google/gemini-2.5-flash'
+// Model riêng cho Tutor Chat
+const TUTOR_CHAT_MODEL = 'openai/gpt-4o'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 dotenv.config({ path: join(__dirname, '.env') })
@@ -123,7 +123,10 @@ const ai = {
             });
 
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error?.message || 'OpenRouter Error');
+            if (!res.ok) {
+                console.error('❌ OpenRouter API Error:', JSON.stringify(data, null, 2));
+                throw new Error(data.error?.message || 'OpenRouter Error');
+            }
             return { text: data.choices[0].message.content };
         }
     },
@@ -135,7 +138,8 @@ const ai = {
             }
             if (history) {
                 history.forEach(h => {
-                    messages.push({ role: h.role, content: h.parts[0].text });
+                    const role = h.role === 'model' ? 'assistant' : h.role;
+                    messages.push({ role, content: h.parts[0].text });
                 });
             }
             return {
@@ -156,7 +160,10 @@ const ai = {
                         body: JSON.stringify(body)
                     });
                     const data = await res.json();
-                    if (!res.ok) throw new Error(data.error?.message || 'OpenRouter Error');
+                    if (!res.ok) {
+                        console.error('❌ OpenRouter Chat Error:', JSON.stringify(data, null, 2));
+                        throw new Error(data.error?.message || 'OpenRouter Error');
+                    }
                     messages.push({ role: 'assistant', content: data.choices[0].message.content });
                     return { text: data.choices[0].message.content };
                 }
@@ -164,7 +171,7 @@ const ai = {
         }
     }
 };
-let currentModel = process.env.AI_MODEL || 'google/gemini-2.5-pro'
+let currentModel = process.env.AI_MODEL || 'openai/gpt-4o'
 console.log(`🤖 AI Model mặc định: ${currentModel}`)
 
 // Lưu OTP tạm thời (production nên dùng Redis)
@@ -428,7 +435,7 @@ app.get('/api/uploads', (req, res) => {
 })
 
 // ============================================
-// AI AGENT APIS (GEMINI 2.5)
+// AI AGENT APIS (GPT-4o)
 // ============================================
 
 // ============================================
@@ -489,9 +496,9 @@ async function handleTutorChat({ messages, context, fileText, fileName, imageBas
         throw new Error('OPENROUTER_API_KEY is not configured')
     }
 
-    // Format history for Gemini SDK
+    // Format history for OpenRouter API (OpenAI uses 'assistant', not 'model')
     const formattedHistory = messages.map(m => ({
-        role: m.role === 'user' ? 'user' : 'model',
+        role: m.role === 'user' ? 'user' : 'assistant',
         parts: [{ text: m.content }]
     }))
 
@@ -566,8 +573,8 @@ Câu nói: "${latestMessage.substring(0, 500)}"`
     let systemMessage = ''
 
     if (intent === 'GRADE') {
-        // === CHẾ ĐỘ CHẤM BÀI: Dùng Gemini Pro (chính xác hơn) ===
-        selectedModel = currentModel // Gemini 2.5 Pro
+        // === CHẾ ĐỘ CHẤM BÀI: Dùng GPT-4o (chính xác hơn) ===
+        selectedModel = currentModel // GPT-4o
         console.log(`📝 [Intent=GRADE] Chấm bài — dùng model: ${selectedModel} (Pro)`)
 
         systemMessage = `Bạn là một Gia sư AI thân thiện của hệ thống LMS ICTU. Nhiệm vụ: CHẤM ĐIỂM bài làm của sinh viên một cách tự nhiên.
@@ -1159,8 +1166,8 @@ app.post('/api/ai/immersive-text', async (req, res) => {
         }
 
         // Nếu không có document text → fallback dùng sections từ frontend
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ error: 'GEMINI_API_KEY is not configured' })
+        if (!process.env.OPENROUTER_API_KEY) {
+            return res.status(500).json({ error: 'OPENROUTER_API_KEY is not configured' })
         }
 
         const sectionsText = sections.map((s) => {
@@ -1204,8 +1211,8 @@ app.post('/api/ai/immersive-text', async (req, res) => {
 // ============================================
 app.post('/api/ai/pre-train', async (req, res) => {
     try {
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ error: 'GEMINI_API_KEY is not configured' })
+        if (!process.env.OPENROUTER_API_KEY) {
+            return res.status(500).json({ error: 'OPENROUTER_API_KEY is not configured' })
         }
 
         // Đọc metadata.json để tìm tất cả courseId/lessonId đã upload
@@ -1274,8 +1281,8 @@ app.post('/api/ai/mindmap', async (req, res) => {
             return res.json(cached)
         }
 
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ error: 'GEMINI_API_KEY is not configured' })
+        if (!process.env.OPENROUTER_API_KEY) {
+            return res.status(500).json({ error: 'OPENROUTER_API_KEY is not configured' })
         }
 
         const sectionsText = sections.map(s => {
@@ -1537,7 +1544,7 @@ Trả về KẾT QUẢ dưới dạng JSON:
 }`
 
         const gradeRes = await ai.models.generateContent({
-            model: currentModel, // Dùng Gemini 2.5 Pro cho chấm điểm (chính xác)
+            model: currentModel, // Dùng GPT-4o cho chấm điểm (chính xác)
             contents: gradingPrompt,
             config: {
                 temperature: 0.2,

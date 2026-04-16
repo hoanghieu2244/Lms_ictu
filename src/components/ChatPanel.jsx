@@ -94,7 +94,7 @@ export default function ChatPanel() {
         }
     }, [input])
 
-    const callGeminiChat = async (userText, file = null) => {
+    const callAIChat = async (userText, file = null) => {
         setIsTyping(true)
         try {
             // Xác định ngữ cảnh thông minh dựa trên URL hiện tại
@@ -173,13 +173,13 @@ export default function ChatPanel() {
         setInput('')
         setAttachedFile(null)
 
-        callGeminiChat(userText, fileToSend)
+        callAIChat(userText, fileToSend)
     }
 
     const handleQuickAction = (text) => {
         if (isTyping) return
         setMessages(prev => [...prev, { role: 'user', text }])
-        callGeminiChat(text)
+        callAIChat(text)
     }
 
     const handleFileSelect = (e) => {
