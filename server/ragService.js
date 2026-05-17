@@ -110,18 +110,34 @@ function cosineSimilarity(vecA, vecB) {
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 async function getEmbeddingWithRetry(text, retries = MAX_RETRIES) {
-    if (!process.env.GEMINI_API_KEY) {
-        throw new Error('Chưa cấu hình GEMINI_API_KEY')
+    const openrouterKey = process.env.OPENROUTER_API_KEY
+    if (!openrouterKey) {
+        throw new Error('Chưa cấu hình OPENROUTER_API_KEY')
     }
 
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
-            const response = await ai.models.embedContent({
-                model: 'gemini-embedding-001',
-                contents: text,
+            const res = await fetch("https://openrouter.ai/api/v1/embeddings", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${openrouterKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: 'openai/text-embedding-3-small',
+                    input: text,
+                    dimensions: 768
+                })
             })
 
-            const embedding = response?.embeddings?.[0]?.values
+            if (!res.ok) {
+                const errorData = await res.json()
+                throw new Error(`OpenRouter API Error: ${JSON.stringify(errorData)}`)
+            }
+
+            const data = await res.json()
+            const embedding = data?.data?.[0]?.embedding
+
             if (!embedding || !Array.isArray(embedding) || embedding.length === 0) {
                 throw new Error('Invalid embedding response: empty or invalid format')
             }
@@ -134,7 +150,7 @@ async function getEmbeddingWithRetry(text, retries = MAX_RETRIES) {
                 console.log(`   Retrying in ${delay}ms...`)
                 await sleep(delay)
             } else {
-                throw new Error(`Embedding failed after ${retries} attempts: ${err.message}`)
+                throw new Error(`Embedding failed sau ${retries} lần thử: ${err.message}`)
             }
         }
     }

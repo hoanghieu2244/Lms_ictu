@@ -1023,6 +1023,58 @@ function clearCache(courseId, lessonId) {
 // ============================================
 // PRE-GENERATE: Tạo sẵn Immersive Text & cache
 // ============================================
+async function generateAndCacheCourseSource(courseId, lessonId, title) {
+    const cached = readCache('source', courseId, lessonId)
+    if (cached) return cached
+
+    if (!process.env.OPENROUTER_API_KEY) {
+        console.error('❌ OPENROUTER_API_KEY chưa cấu hình')
+        return null
+    }
+
+    const realDocumentText = await getDocumentTextByLesson(courseId, lessonId)
+    if (!realDocumentText) {
+        console.log(`⚠️ Chưa có document text cho ${courseId}/${lessonId}`)
+        return null
+    }
+
+    const prompt = `Vai trò: Bạn là giảng viên đại học. Nhiệm vụ của bạn là đọc nội dung bài giảng dưới đây và tóm tắt lại thành cấu trúc Source bài học bao gồm: Mục tiêu bài học, Chuẩn đầu ra, và Nội dung giảng dạy.
+KHÔNG sinh thêm kiến thức ngoài. Phải lấy từ nội dung bài giảng gốc.
+Định dạng output là JSON STRICTLY MATCHING schema này:
+{
+  "title": "Tên bài học (dựa theo tiêu đề bài giảng)",
+  "sections": [
+    {
+      "heading": "Tiêu đề phần (ví dụ: Mục tiêu bài học, Chuẩn đầu ra, Nội dung giảng dạy...)",
+      "text": "Nội dung văn bản (có thể xuống dòng bằng \\n). Có thể rỗng nếu dùng list.",
+      "list": ["mục 1", "mục 2"]
+    }
+  ]
+}
+
+NỘI DUNG BÀI GIẢNG GỐC:
+${realDocumentText}`
+
+    try {
+        console.log(`🚀 Đang tạo Course Source cho ${courseId}/${lessonId}...`)
+        const response = await ai.models.generateContent({
+            model: currentModel,
+            contents: prompt,
+            config: {
+                temperature: 0.3,
+                responseMimeType: 'application/json'
+            }
+        })
+        const result = JSON.parse(response.text)
+        writeCache('source', courseId, lessonId, result)
+        console.log(`✅ Đã tạo & cache Course Source cho ${courseId}/${lessonId}`)
+        return result
+    } catch (err) {
+        console.error(`❌ Lỗi tạo Course Source:`, err.message)
+        return null
+    }
+}
+
 async function generateAndCacheImmersiveText(courseId, lessonId, title) {
     // Kiểm tra cache trước
     const cached = readCache('immersive', courseId, lessonId)
@@ -1142,6 +1194,30 @@ ${sourceDataNote}`
 // API: Immersive Text (AI diễn giải nội dung)
 // Ưu tiên load từ cache (pre-trained), fallback gọi AI nếu chưa có
 // ============================================
+app.post('/api/ai/course-source', async (req, res) => {
+    try {
+        const { courseId, lessonId, title } = req.body
+        if (!courseId || !lessonId) {
+            return res.status(400).json({ error: 'Thiếu courseId hoặc lessonId' })
+        }
+
+        const cached = readCache('source', courseId, lessonId)
+        if (cached) {
+            return res.json(cached)
+        }
+
+        const result = await generateAndCacheCourseSource(courseId, lessonId, title)
+        if (result) {
+            return res.json(result)
+        }
+
+        return res.status(404).json({ error: 'Chưa có dữ liệu bài giảng gốc. Vui lòng tải lên file tài liệu ở tab Tài liệu tham khảo.' })
+    } catch (err) {
+        console.error('❌ Lỗi Course Source:', err)
+        res.status(500).json({ error: 'Lỗi hệ thống' })
+    }
+})
+
 app.post('/api/ai/immersive-text', async (req, res) => {
     try {
         const { courseId, lessonId, title, sections } = req.body

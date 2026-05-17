@@ -31,7 +31,7 @@ async function main() {
         
         if (!fs.existsSync(filePath)) {
             const altPath = path.join(UPLOADS_DIR, file.courseId, file.lessonId, file.storedName)
-            if (fs.existsSync(filePath)) {
+            if (fs.existsSync(altPath)) {
                 file.path = altPath
             } else {
                 console.log(`⚠️  File không tồn tại: ${file.originalName}`)
