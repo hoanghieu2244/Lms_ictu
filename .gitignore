@@ -11,15 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
-# Environment variables (Bảo mật cấu hình và API)
+# Environment variables
 .env
-.env.local
-.env.development
-.env.test
-.env.production
-
-# Cho phép đẩy file mẫu lên để tham khảo
-!.env.example
+.env.*
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
