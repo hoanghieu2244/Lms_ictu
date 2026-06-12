@@ -27,11 +27,15 @@ dist-ssr
 *.sw?
 
 # ---------- Local Data & Cache ----------
-# Cho phép đẩy tài liệu bài giảng và AI cache lên repo
-# server/uploads/
-# server/ai-cache/
-# server/vector_db.json
-# server/quiz-history.json
+server/uploads/
+server/ai-cache/
+server/vector_db.json
+server/quiz-history.json
+
+# ---------- Documents & Slides ----------
+BAO_CAO_DO_AN.md
+slides/
+scratch/
 
 # Bỏ qua các file .env trong server nếu có
 server/.env

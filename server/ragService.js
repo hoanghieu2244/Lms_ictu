@@ -1,7 +1,6 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { createRequire } from 'module'
 
 // Polyfill browser globals needed by pdfjs-dist (used by pdf-parse)
 // These are normally provided by @napi-rs/canvas, but its native binding may fail to load
@@ -19,9 +18,8 @@ if (typeof globalThis.ImageData === 'undefined') {
     }
 }
 
-const require = createRequire(import.meta.url)
-const pdfParse = require('pdf-parse')
-const mammoth = require('mammoth')
+import pdfParse from 'pdf-parse'
+import mammoth from 'mammoth'
 import { GoogleGenAI } from '@google/genai'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
@@ -93,7 +91,7 @@ const saveVectorDB = () => {
     }
 }
 
-function cosineSimilarity(vecA, vecB) {
+export function cosineSimilarity(vecA, vecB) {
     if (!vecA || !vecB || vecA.length !== vecB.length) return 0
     let dotProduct = 0
     let normA = 0

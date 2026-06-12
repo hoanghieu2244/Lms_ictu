@@ -1,16 +1,44 @@
-# React + Vite
+# AI Tutor LMS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Hệ thống quản lý học tập tích hợp Trợ giảng AI Agent (AI Tutor LMS) hỗ trợ học tập cá nhân hóa cho sinh viên.
 
-Currently, two official plugins are available:
+## Cấu trúc dự án
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- `/server`: Node.js Backend Server (sử dụng Express, MongoDB và tích hợp API Gemini thông qua SDK `@google/generative-ai` chính thức).
+- `/angular-frontend`: Angular Frontend Client (sử dụng Angular 18+, Standalone Components, Signals và RxJS để quản lý State bất đồng bộ).
 
-## React Compiler
+## Hướng dẫn cài đặt & Khởi chạy nhanh
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Khởi chạy Backend Server
+1. Truy cập thư mục server: 
+   ```bash
+   cd server
+   ```
+2. Tạo tệp `.env` dựa theo mẫu `.env.example` và điền khóa API:
+   - `GEMINI_API_KEY`: API Key của Google Gemini.
+   - `MONGODB_URI`: URL kết nối cơ sở dữ liệu MongoDB.
+   - `OPENROUTER_API_KEY`: API Key của OpenRouter (nếu có dùng mô hình ngoài).
+3. Cài đặt thư viện:
+   ```bash
+   npm install
+   ```
+4. Khởi chạy server:
+   ```bash
+   npm start
+   ```
+   *Server sẽ chạy tại: `http://localhost:3001`*
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 2. Khởi chạy Angular Frontend
+1. Truy cập thư mục frontend:
+   ```bash
+   cd angular-frontend
+   ```
+2. Cài đặt thư viện:
+   ```bash
+   npm install
+   ```
+3. Khởi chạy client:
+   ```bash
+   npm start
+   ```
+   *Ứng dụng sẽ chạy tại: `http://localhost:4200`*
