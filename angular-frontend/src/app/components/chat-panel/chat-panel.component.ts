@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
   imports: [FormsModule],
   template: `
       <div class="chat-panel" [class.open]="state.chatOpen()" [style.width.px]="panelWidth()">
+        <div class="chat-resizer" (mousedown)="onResizeStart($event)"></div>
         <div class="chat-header" style="flex-shrink:0">
           <h3>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -92,6 +93,26 @@ export class ChatPanelComponent implements AfterViewChecked {
   attachedFile = signal<File | null>(null);
   panelWidth = signal(420);
   private shouldScroll = false;
+
+  onResizeStart(event: MouseEvent) {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startWidth = this.panelWidth();
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = startX - moveEvent.clientX;
+      const newWidth = Math.max(350, Math.min(window.innerWidth - 100, startWidth + deltaX));
+      this.panelWidth.set(newWidth);
+    };
+
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }
 
   ngAfterViewChecked() {
     if (this.shouldScroll) {
